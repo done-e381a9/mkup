@@ -33,8 +33,17 @@ const (
 <meta charset="UTF-8">
 <title>%s</title>
 <link rel="stylesheet" href="/_assets/sanitize.css" media="all">
+
+<!-- custom light theme -->
+<link rel="stylesheet" href="/_assets/github-light.css" media="all">
+<link rel="stylesheet" href="/_assets/github-markdown-light.css" media="all">
+<link rel="stylesheet" href="/_assets/style-light.css" media="all">
+
+<!-- original dark theme
 <link rel="stylesheet" href="/_assets/style.css" media="all">
 <link rel="stylesheet" href="/_assets/github-dark.css" media="all">
+-->
+
 <script src="/_assets/highlight.min.js"></script>
 <script>hljs.highlightAll();</script>
 <script>document.write('<script src="http://'
