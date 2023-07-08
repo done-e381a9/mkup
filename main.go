@@ -9,6 +9,7 @@ import (
 	"mime"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -74,7 +75,27 @@ var local embed.FS
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	flag.Parse()
-	cwd, _ := os.Getwd()
+
+	var argpath string
+	var cwd string
+	var urlpath string
+	if len(os.Args) == 2 {
+		argpath = os.Args[1]
+	} else if len(os.Args) == 1 {
+		argpath, _ = os.Getwd()
+	}
+	stat, err := os.Stat(argpath)
+	if err != nil {
+		panic(err)
+	}
+	if stat.IsDir() {
+		cwd = argpath
+		urlpath = ""
+	} else {
+		cwd = filepath.Dir(argpath)
+		urlpath = filepath.Base(argpath)
+	}
+	fmt.Printf("watch %s\n", cwd)
 
 	lrs := livereload.New("mkup")
 	defer lrs.Close()
@@ -176,5 +197,28 @@ func main() {
 	}
 
 	fmt.Fprintln(os.Stderr, "Listening at "+*addr)
+
+	if err := openurl("http://localhost:8000/" + urlpath); err != nil {
+		panic(err)
+	}
+
 	log.Fatal(server.ListenAndServe())
+}
+
+func openurl(url string) error {
+	var cmd string
+	var args []string
+
+	switch runtime.GOOS {
+	case "windows":
+		cmd = "cmd"
+		args = []string{"/c", "start"}
+	case "darwin":
+		cmd = "open"
+	default: // "linux", "freebsd", "openbsd", "netbsd"
+		cmd = "xdg-open"
+	}
+	args = append(args, url)
+	fmt.Println(args)
+	return exec.Command(cmd, args...).Start()
 }
